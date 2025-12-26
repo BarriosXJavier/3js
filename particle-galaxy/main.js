@@ -25,9 +25,9 @@ composer.addPass(renderPass);
 
 const bloomPass = new UnrealBloomPass(
     new THREE.Vector2(window.innerWidth, window.innerHeight),
-    1.5, // strength
-    0.4, // radius
-    0.85 // threshold
+    1.5,
+    0.4,
+    0.85
 );
 composer.addPass(bloomPass);
 
@@ -56,6 +56,10 @@ const parameters = {
 let geometry = null;
 let material = null;
 let points = null;
+
+// Wave disturbances
+const waves = [];
+const MAX_WAVES = 5;
 
 const generateGalaxy = () => {
     if (points !== null) {
@@ -101,41 +105,95 @@ const generateGalaxy = () => {
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geometry.setAttribute('aScale', new THREE.BufferAttribute(scales, 1));
 
-    // Custom shader material
+    // Custom shader material with wave uniforms
     material = new THREE.ShaderMaterial({
         depthWrite: false,
         blending: THREE.AdditiveBlending,
         vertexColors: true,
         uniforms: {
             uTime: { value: 0 },
-            uSize: { value: parameters.size * renderer.getPixelRatio() }
+            uSize: { value: parameters.size * renderer.getPixelRatio() },
+            uWave1Pos: { value: new THREE.Vector3(99999, 99999, 99999) },
+            uWave2Pos: { value: new THREE.Vector3(99999, 99999, 99999) },
+            uWave3Pos: { value: new THREE.Vector3(99999, 99999, 99999) },
+            uWave4Pos: { value: new THREE.Vector3(99999, 99999, 99999) },
+            uWave5Pos: { value: new THREE.Vector3(99999, 99999, 99999) },
+            uWave1Time: { value: 999 },
+            uWave2Time: { value: 999 },
+            uWave3Time: { value: 999 },
+            uWave4Time: { value: 999 },
+            uWave5Time: { value: 999 }
         },
         vertexShader: `
             uniform float uTime;
             uniform float uSize;
+            uniform vec3 uWave1Pos;
+            uniform vec3 uWave2Pos;
+            uniform vec3 uWave3Pos;
+            uniform vec3 uWave4Pos;
+            uniform vec3 uWave5Pos;
+            uniform float uWave1Time;
+            uniform float uWave2Time;
+            uniform float uWave3Time;
+            uniform float uWave4Time;
+            uniform float uWave5Time;
             attribute float aScale;
             varying vec3 vColor;
+            varying float vBrightness;
+            
+            float calculateWave(vec3 pos, vec3 wavePos, float waveTime) {
+                if (waveTime > 900.0) return 0.0;
+                
+                float dist = distance(pos.xz, wavePos.xz);
+                float waveRadius = waveTime * 30.0;
+                float waveFront = waveRadius - dist;
+                
+                // Ocean wave envelope - peak at front, decay behind
+                float amplitude = exp(-waveTime * 0.8) * 15.0;
+                float width = 20.0 + waveTime * 5.0;
+                float envelope = exp(-pow(waveFront, 2.0) / (2.0 * width));
+                
+                // Wave oscillation
+                float wave = sin(dist * 0.2 - waveTime * 4.0) * envelope * amplitude;
+                
+                return wave;
+            }
             
             void main() {
                 vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+                
+                // Apply all active waves
+                float totalWave = 0.0;
+                totalWave += calculateWave(modelPosition.xyz, uWave1Pos, uWave1Time);
+                totalWave += calculateWave(modelPosition.xyz, uWave2Pos, uWave2Time);
+                totalWave += calculateWave(modelPosition.xyz, uWave3Pos, uWave3Time);
+                totalWave += calculateWave(modelPosition.xyz, uWave4Pos, uWave4Time);
+                totalWave += calculateWave(modelPosition.xyz, uWave5Pos, uWave5Time);
+                
+                modelPosition.y += totalWave;
+                
                 vec4 viewPosition = viewMatrix * modelPosition;
                 vec4 projectedPosition = projectionMatrix * viewPosition;
                 
                 gl_Position = projectedPosition;
-                gl_PointSize = uSize * aScale * (1.0 / -viewPosition.z);
+                
+                // Brightness based on wave displacement
+                vBrightness = 1.0 + abs(totalWave) * 0.05;
+                gl_PointSize = uSize * aScale * (1.0 / -viewPosition.z) * vBrightness;
                 
                 vColor = color;
             }
         `,
         fragmentShader: `
             varying vec3 vColor;
+            varying float vBrightness;
             
             void main() {
                 float strength = distance(gl_PointCoord, vec2(0.5));
                 strength = 1.0 - strength;
                 strength = pow(strength, 3.0);
                 
-                vec3 color = mix(vec3(0.0), vColor, strength);
+                vec3 color = mix(vec3(0.0), vColor * vBrightness, strength);
                 gl_FragColor = vec4(color, strength);
             }
         `
@@ -191,6 +249,36 @@ const light2 = new THREE.PointLight(0x1b3984, 2, 200);
 light2.position.set(-50, 0, 0);
 scene.add(light2);
 
+// Raycaster for click detection
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+// Handle click for wave creation
+window.addEventListener('click', (event) => {
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    
+    raycaster.setFromCamera(mouse, camera);
+    
+    // Intersect with horizontal plane at y=0
+    const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+    const intersectionPoint = new THREE.Vector3();
+    raycaster.ray.intersectPlane(plane, intersectionPoint);
+    
+    if (intersectionPoint) {
+        // Add new wave
+        waves.push({
+            position: intersectionPoint.clone(),
+            startTime: performance.now() / 1000
+        });
+        
+        // Keep only the most recent waves
+        if (waves.length > MAX_WAVES) {
+            waves.shift();
+        }
+    }
+});
+
 // Animation
 const clock = new THREE.Clock();
 
@@ -199,9 +287,34 @@ const animate = () => {
     
     const elapsedTime = clock.getElapsedTime();
     
-    // Update shader uniform
+    // Update shader uniforms
     if (material.uniforms) {
         material.uniforms.uTime.value = elapsedTime;
+        
+        // Update wave uniforms
+        const posUniforms = ['uWave1Pos', 'uWave2Pos', 'uWave3Pos', 'uWave4Pos', 'uWave5Pos'];
+        const timeUniforms = ['uWave1Time', 'uWave2Time', 'uWave3Time', 'uWave4Time', 'uWave5Time'];
+        
+        // Remove old waves (after 3 seconds)
+        for (let i = waves.length - 1; i >= 0; i--) {
+            const waveAge = elapsedTime - waves[i].startTime;
+            if (waveAge > 3.0) {
+                waves.splice(i, 1);
+            }
+        }
+        
+        // Update shader with active waves
+        for (let i = 0; i < MAX_WAVES; i++) {
+            if (i < waves.length) {
+                const wave = waves[i];
+                const waveTime = elapsedTime - wave.startTime;
+                material.uniforms[posUniforms[i]].value.copy(wave.position);
+                material.uniforms[timeUniforms[i]].value = waveTime;
+            } else {
+                material.uniforms[posUniforms[i]].value.set(99999, 99999, 99999);
+                material.uniforms[timeUniforms[i]].value = 999;
+            }
+        }
     }
     
     // Rotate galaxy with slight wobble
