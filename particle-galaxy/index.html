@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Particle Galaxy - Three.js Learning</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+        }
+        canvas {
+            display: block;
+        }
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-size: 14px;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+            pointer-events: none;
+            background: rgba(0,0,0,0.5);
+            padding: 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+        }
+        #info h2 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            color: #ff6030;
+        }
+        #info p {
+            margin: 5px 0;
+            opacity: 0.9;
+        }
+        #concepts {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            color: white;
+            font-size: 12px;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+            pointer-events: none;
+            background: rgba(0,0,0,0.5);
+            padding: 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+            max-width: 300px;
+        }
+        #concepts h3 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            color: #1b3984;
+        }
+        #concepts ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        #concepts li {
+            margin: 3px 0;
+            opacity: 0.85;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h2>Particle Galaxy</h2>
+        <p><strong>Controls:</strong></p>
+        <p>Drag to rotate</p>
+        <p>Scroll to zoom</p>
+        <p>Space - Toggle auto-rotate</p>
+        <p>R - Reset camera</p>
+    </div>
+    <div id="concepts">
+        <h3>Three.js Concepts Used:</h3>
+        <ul>
+            <li>BufferGeometry (100k particles)</li>
+            <li>Custom Shaders (GLSL)</li>
+            <li>Post-processing (Bloom)</li>
+            <li>PointsMaterial & ShaderMaterial</li>
+            <li>OrbitControls</li>
+            <li>Multiple render passes</li>
+            <li>Dynamic lighting</li>
+            <li>Tone mapping</li>
+        </ul>
+    </div>
+    <script type="module" src="/main.js"></script>
+</body>
+</html>
