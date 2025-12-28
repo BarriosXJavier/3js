@@ -3,11 +3,9 @@ import MoonScene from "./components/MoonScene";
 
 function App() {
   return (
-    <>
-      <div>
-        <MoonScene />
-      </div>
-    </>
+    <div style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}>
+      <MoonScene />
+    </div>
   );
 }
 
