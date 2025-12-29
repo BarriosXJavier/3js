@@ -1,33 +1,28 @@
-# 3js
+# 3js Portfolio
 
-Collection of my Three.js projects for learning and experimentation.
+A collection of my Three.js projects for learning and exprerimentation
 
-## Projects
-
-### 1. Particle Galaxy
-
-![Particle Galaxy](./particle-galaxy/assets/screenshots/galaxy.png)
-
-**Concepts:** BufferGeometry, Custom Shaders, Post-processing, Bloom effects  
-**Status:** Complete
-
-### 2. Moonlit Night
-
-![Moonlit Night](./moonlit-night/assets/screenshots/moonlit-night.png)
-
-## Running Projects
-
-Each project uses Vite for development:
+## 💻 Development
 
 ```bash
-cd project-name
+# Install dependencies
 bun install
+
+# Run development server
 bun run dev
+
+# Build for production
+bun run build
+
+# Preview production build
+bun run preview
 ```
 
-## Resources
+
+## 📚 Learning Resources
 
 - [Three.js Documentation](https://threejs.org/docs/)
 - [Three.js Examples](https://threejs.org/examples/)
 - [Three.js Journey](https://threejs-journey.com/)
 - [WebGL Fundamentals](https://webglfundamentals.org/)
+- [React Three Fiber](https://docs.pmnd.rs/react-three-fiber)
