@@ -2,7 +2,7 @@
 
 An animated moonlit night scene with a rising moon, drifting clouds, and a starry sky built with React Three Fiber.
 
-![moonlit-night](./assets/screenshots/Screenshot From 2025-12-28 18-00-47.png)
+![moonlit-night](./assets/screenshots/moonlit-night.png)
 
 ## Features
 
@@ -42,19 +42,4 @@ Opens at http://localhost:5173
 bun run build
 ```
 
-## Project Structure
-
-```
-moonlit-night/
-├── src/
-│   ├── components/
-│   │   ├── MoonScene.tsx    # Main scene setup
-│   │   ├── Moon.tsx         # Moon mesh with light
-│   │   ├── Cloud.tsx        # Cloud with canvas texture
-│   │   └── Stars.tsx        # Star field particles
-│   ├── App.tsx
-│   └── main.tsx
-├── package.json
-└── README.md
-```
 

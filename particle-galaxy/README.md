@@ -6,7 +6,7 @@ An animated spiral galaxy visualization with 100,000+ particles, custom shaders,
 
 ## Features
 
-- 100k particle spiral galaxy with 6 arms
+- 100k particle spiral galaxy
 - Custom GLSL shaders for particle rendering
 - Post-processing bloom effects
 - Multi-layered star field
