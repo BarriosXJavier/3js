@@ -2,6 +2,8 @@
 
 An animated moonlit night scene with a rising moon, drifting clouds, and a starry sky built with React Three Fiber.
 
+![moonlit-night](./assets/screenshots/Screenshot From 2025-12-28 18-00-47.png)
+
 ## Features
 
 - Rising moon with emissive glow and point light
