@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
-import MoonScene from '../components/MoonScene'
+import MoonScene from './components/MoonScene'
 
 export default function MoonlitNight() {
   return (
