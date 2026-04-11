@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
-import MoonlitNight from './projects/MoonlitNight'
+import MoonlitNight from './projects/moonlit-night'
 import ParticleGalaxy from './projects/ParticleGalaxy'
 
 function App() {
