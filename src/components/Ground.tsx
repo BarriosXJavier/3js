@@ -107,7 +107,7 @@ export default function Ground() {
     ctx.fillStyle = "#1a1a28";
     ctx.fillRect(0, 0, 2048, 2048);
 
-    // Add texture variation with noise
+    // texture variation with noise
     for (let i = 0; i < 5000; i++) {
       const x = Math.random() * 2048;
       const y = Math.random() * 2048;

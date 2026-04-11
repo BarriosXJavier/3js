@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import * as THREE from "three";
 import Moon from "./Moon";
 import Cloud from "./Cloud";
@@ -7,7 +7,41 @@ import Ground from "./Ground";
 import { Canvas } from "@react-three/fiber";
 
 export default function MoonScene() {
-  const moonPosRef = useRef(new THREE.Vector3(0, -12, -60));
+  const moonPosRef = useRef(new THREE.Vector3(0, -15, -60));
+  const horizonClouds = useMemo(() => {
+    const clouds: Array<{
+      startPos: [number, number, number];
+      scale: number;
+      speed: number;
+      seed: number;
+    }> = [];
+
+    let x = -195;
+    let seed = 1;
+
+    while (x < 190) {
+      const clusterNoise = Math.sin(seed * 0.91) * 0.5 + 0.5;
+      const gapNoise = Math.cos(seed * 1.37) * 0.5 + 0.5;
+      const scale = 1.9 + clusterNoise * 2.8;
+      const y = 2 + Math.sin(seed * 1.12) * 1.4 + gapNoise * 2.3;
+      const z = -250 - (Math.cos(seed * 0.78) * 0.5 + 0.5) * 90;
+      const speed = 0.16 + gapNoise * 0.22;
+
+      clouds.push({
+        startPos: [x, y, z],
+        scale,
+        speed,
+        seed,
+      });
+
+      const baseGap = 12 + gapNoise * 24;
+      const extraGap = seed % 5 === 0 ? 24 + clusterNoise * 18 : 0;
+      x += scale * 8 + baseGap + extraGap;
+      seed += 1;
+    }
+
+    return clouds;
+  }, []);
 
   return (
     <div className="w-full h-screen bg-slate-950">
@@ -20,44 +54,19 @@ export default function MoonScene() {
         <Moon moonPosRef={moonPosRef} />
         <Ground />
 
-        {/* Clouds behind mountains - z < -240 */}
-        <Cloud
-          startPos={[-15, 4, -250]}
-          speed={0.3}
-          scale={3.5}
-          moonPosRef={moonPosRef}
-        />
-        <Cloud
-          startPos={[-5, 3, -255]}
-          speed={0.4}
-          scale={3.0}
-          moonPosRef={moonPosRef}
-        />
-        <Cloud
-          startPos={[8, 2.5, -260]}
-          speed={0.35}
-          scale={3.8}
-          moonPosRef={moonPosRef}
-        />
-        <Cloud
-          startPos={[12, 4.5, -245]}
-          speed={0.5}
-          scale={2.8}
-          moonPosRef={moonPosRef}
-        />
-        <Cloud
-          startPos={[-8, 5, -258]}
-          speed={0.45}
-          scale={3.3}
-          moonPosRef={moonPosRef}
-        />
-        <Cloud
-          startPos={[3, 3.8, -262]}
-          speed={0.25}
-          scale={4.0}
-          moonPosRef={moonPosRef}
-        />
+        {/* Horizon clouds behind the mountain silhouette */}
         <ambientLight intensity={0.03} />
+        {horizonClouds.map((cloud) => (
+          <Cloud
+            key={cloud.seed}
+            startPos={cloud.startPos}
+            speed={cloud.speed}
+            scale={cloud.scale}
+            seed={cloud.seed}
+            wrapRange={[-220, 220]}
+            moonPosRef={moonPosRef}
+          />
+        ))}
       </Canvas>
     </div>
   );

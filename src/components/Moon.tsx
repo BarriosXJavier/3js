@@ -27,7 +27,7 @@ export default function Moon({ moonPosRef }: MoonProps) {
         glowRef.current.position.y = meshRef.current.position.y;
       }
 
-      // Update directional light to follow moon
+      // directional light to follow moon
       if (directionalLightRef.current) {
         directionalLightRef.current.position.set(
           meshRef.current.position.x,
@@ -82,12 +82,12 @@ export default function Moon({ moonPosRef }: MoonProps) {
         castShadow
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
-        shadow-camera-left={-400} // Expanded from -200
-        shadow-camera-right={400} // Expanded from 200
-        shadow-camera-top={150} // Expanded from 100
-        shadow-camera-bottom={-150} // Expanded from -100
+        shadow-camera-left={-400}
+        shadow-camera-right={400}
+        shadow-camera-top={150}
+        shadow-camera-bottom={-150}
         shadow-camera-near={0.5}
-        shadow-camera-far={600} // Expanded from 500
+        shadow-camera-far={600}
       />
     </group>
   );

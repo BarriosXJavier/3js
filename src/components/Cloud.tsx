@@ -7,22 +7,36 @@ interface CloudProps {
   startPos: [number, number, number];
   speed?: number;
   scale?: number;
+  seed?: number;
+  wrapRange?: [number, number];
   moonPosRef?: React.RefObject<THREE.Vector3>;
 }
 
-export default function Cloud({ startPos, speed = 0.3, scale = 1, moonPosRef }: CloudProps) {
+export default function Cloud({
+  startPos,
+  speed = 0.3,
+  scale = 1,
+  seed = 0,
+  wrapRange = [-220, 220],
+  moonPosRef,
+}: CloudProps) {
   const groupRef = useRef<Group>(null);
   const materialRef = useRef<MeshStandardMaterial>(null);
-  
+
   const texture = useMemo(() => {
     const canvas = document.createElement("canvas");
-    canvas.width = 1024;  
+    canvas.width = 1024;
     canvas.height = 512;
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
-    
+
     ctx.clearRect(0, 0, 1024, 512);
-    
+
+    const random = (offset: number) => {
+      const value = Math.sin(seed * 97.13 + offset * 41.7) * 43758.5453;
+      return value - Math.floor(value);
+    };
+
     const addCloudPuff = (x: number, y: number, r: number, opacity: number) => {
       const grad = ctx.createRadialGradient(x, y, r * 0.2, x, y, r);
       grad.addColorStop(0, `rgba(240, 240, 250, ${opacity})`);
@@ -32,52 +46,53 @@ export default function Cloud({ startPos, speed = 0.3, scale = 1, moonPosRef }: 
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, 1024, 512);
     };
-    
-    // More puffs for fuller clouds
-    addCloudPuff(400, 256, 200, 0.55);
-    addCloudPuff(560, 280, 180, 0.5);
-    addCloudPuff(640, 220, 160, 0.45);
-    addCloudPuff(300, 300, 150, 0.4);
-    addCloudPuff(480, 200, 140, 0.38);
-    addCloudPuff(200, 280, 120, 0.35);
-    
+
+    const puffCount = 5 + Math.floor(random(1) * 5);
+    for (let i = 0; i < puffCount; i++) {
+      const x = 160 + random(i + 2) * 700;
+      const y = 160 + random(i + 20) * 180;
+      const radius = 90 + random(i + 40) * 150;
+      const opacity = 0.22 + random(i + 60) * 0.28;
+      addCloudPuff(x, y, radius, opacity);
+    }
+
     return new THREE.CanvasTexture(canvas);
-  }, []);
-  
+  }, [seed]);
+
   useFrame((_state, delta) => {
     if (!groupRef.current) return;
-    
+
     groupRef.current.position.x += speed * delta;
-    if (groupRef.current.position.x > 25) {
-      groupRef.current.position.x = -25;
+    if (groupRef.current.position.x > wrapRange[1]) {
+      groupRef.current.position.x = wrapRange[0];
     }
-    
+
     if (materialRef.current && moonPosRef && moonPosRef.current) {
       const cloudPos = groupRef.current.position;
       const moonPos = moonPosRef.current;
       const dx = cloudPos.x - moonPos.x;
       const dy = cloudPos.y - moonPos.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      
-      if (dist < 8) {  // Increased from 4 for larger clouds
-         const intensity = 1 - (dist / 8);
-         materialRef.current.emissiveIntensity = 0.05 + (intensity * 0.5);
-         materialRef.current.opacity = 0.6 + (intensity * 0.2);
+
+      if (dist < 8) {
+        const intensity = 1 - dist / 8;
+        materialRef.current.emissiveIntensity = 0.05 + intensity * 0.5;
+        materialRef.current.opacity = 0.6 + intensity * 0.2;
       } else {
-         materialRef.current.emissiveIntensity = 0.05;
-         materialRef.current.opacity = 0.6;
+        materialRef.current.emissiveIntensity = 0.05;
+        materialRef.current.opacity = 0.6;
       }
     }
   });
-  
+
   return (
     <group ref={groupRef} position={startPos} scale={scale}>
       <mesh receiveShadow>
         <planeGeometry args={[60, 30]} />
-        <meshStandardMaterial 
+        <meshStandardMaterial
           ref={materialRef}
-          map={texture} 
-          transparent={true} 
+          map={texture}
+          transparent={true}
           depthWrite={false}
           opacity={0.6}
           emissive="#ffffff"
