@@ -398,6 +398,67 @@ export default function Home() {
               </div>
             </div>
           </Link>
+
+          <Link
+            to="/ocean-sunset"
+            className={`group relative overflow-hidden rounded-2xl transition-all duration-300 hover:scale-[1.02] ${
+              theme === "dark"
+                ? "bg-neutral-900 border border-neutral-800 hover:border-neutral-600"
+                : "bg-white border border-gray-200 hover:border-gray-400 shadow-lg"
+            }`}
+          >
+            <div className="aspect-video relative overflow-hidden bg-black">
+              {/* <img */}
+              {/*   src="/moonlit-night/screenshots/moonlit-night.png" */}
+              {/*   alt="Moonlit Night" */}
+              {/*   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" */}
+              {/* /> */}
+              <div className="absolute inset-0 bg-linear-to-t from-black to-transparent opacity-60" />
+            </div>
+            <div className="p-6">
+              <div className="flex items-center gap-2 mb-2">
+                <h2
+                  className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                >
+                  Moonlit Night
+                </h2>
+              </div>
+              <p
+                className={`mb-4 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}
+              >
+                Sunset scene in the ocean
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <span
+                  className={`px-3 py-1 rounded-full text-sm ${
+                    theme === "dark"
+                      ? "bg-neutral-800 text-gray-300"
+                      : "bg-gray-100 text-gray-700"
+                  }`}
+                >
+                  React Three Fiber
+                </span>
+                <span
+                  className={`px-3 py-1 rounded-full text-sm ${
+                    theme === "dark"
+                      ? "bg-neutral-800 text-gray-300"
+                      : "bg-gray-100 text-gray-700"
+                  }`}
+                >
+                  Drei
+                </span>
+                <span
+                  className={`px-3 py-1 rounded-full text-sm ${
+                    theme === "dark"
+                      ? "bg-neutral-800 text-gray-300"
+                      : "bg-gray-100 text-gray-700"
+                  }`}
+                >
+                  Lighting
+                </span>
+              </div>
+            </div>
+          </Link>
         </div>
 
         <footer
