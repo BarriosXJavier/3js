@@ -20,7 +20,7 @@ export default function Home() {
 
   return (
     <div
-      className={`min-h-screen flex items-center justify-center p-4 relative overflow-hidden ${
+      className={`min-h-screen flex flex-col items-center justify-center p-4 relative ${
         theme === "dark" ? "bg-black" : "bg-gray-50"
       }`}
     >
